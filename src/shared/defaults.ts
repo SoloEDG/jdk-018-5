@@ -1,4 +1,30 @@
-import type { StudioDocument } from "./document";
+import type { StudioDocument, TraceState } from "./document";
+export function createTrace(): TraceState {
+  return {
+    guides: [],
+    junctions: [],
+    rejected: [],
+    settings: {
+      enabled: false,
+      policy: "structure",
+      glyphSet: "box",
+      budgetPercent: 22,
+      autoThreshold: 0.34,
+      ink: false,
+      showAuto: true,
+      showGuides: true,
+      snap: true,
+      allowDiag: false,
+      allowCross: false,
+      weld: true,
+    },
+    selectedCell: null,
+    selectedGuide: null,
+    focusConstraint: null,
+    nextId: 1,
+    tool: "guide",
+  };
+}
 export function createDocument(): StudioDocument {
   return {
     asset: null,
@@ -13,6 +39,7 @@ export function createDocument(): StudioDocument {
       color: true,
       background: "#101216",
     },
+    trace: createTrace(),
     grid: null,
     revision: 0,
   };

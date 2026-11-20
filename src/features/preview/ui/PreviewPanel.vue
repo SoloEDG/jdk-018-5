@@ -1,28 +1,33 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { Code2, Scan, Minus, Plus } from "lucide-vue-next";
+import { Code2, Scan, Minus, Plus, Pencil, Grid3x3 } from "lucide-vue-next";
 import { usePreview } from "../model/usePreview";
 import { gridRows } from "../lib/rows";
 import ArtCanvas from "./ArtCanvas.vue";
+import TraceStage from "../../trace/ui/TraceStage.vue";
+import TraceTextPanel from "../../trace/ui/TraceTextPanel.vue";
 const p = usePreview();
 const text = computed(() =>
   p.doc.grid ? gridRows(p.doc.grid).join("\n") : "",
 );
+function tab(mode: "art" | "text" | "trace") {
+  p.mode.value = mode;
+}
 </script>
 <template>
   <main class="workspace">
     <div class="preview-toolbar">
       <div class="tabs">
-        <button
-          :class="{ active: p.mode.value === 'art' }"
-          @click="p.mode.value = 'art'"
-        >
+        <button :class="{ active: p.mode.value === 'art' }" @click="tab('art')">
           <Scan :size="14" /> 字符预览</button
+        ><button :class="{ active: p.mode.value === 'text' }" @click="tab('text')">
+          <Grid3x3 :size="14" /> 约束文本</button
         ><button
-          :class="{ active: p.mode.value === 'text' }"
-          @click="p.mode.value = 'text'"
+          v-if="p.doc.trace.settings.enabled"
+          :class="{ active: p.mode.value === 'trace' }"
+          @click="tab('trace')"
         >
-          <Code2 :size="14" /> 纯文本
+          <Pencil :size="14" /> 原图描摹
         </button>
       </div>
       <label class="color-toggle"
@@ -32,9 +37,23 @@ const text = computed(() =>
           v-model="p.doc.settings.color"
       /></label>
     </div>
-    <div class="art-stage">
-      <div class="stage-label">OUTPUT / LIVE RENDER <span>●</span></div>
-      <div class="art-scroll">
+    <div class="art-stage" :class="{ 'trace-stage-wrap': p.mode.value === 'trace' }">
+      <div class="stage-label">
+        {{
+          p.mode.value === "trace"
+            ? "TRACE / ORIGINAL COORDINATES"
+            : "OUTPUT / LIVE RENDER"
+        }}
+        <span>●</span>
+      </div>
+      <div v-if="p.mode.value === 'trace'" class="trace-scroll">
+        <TraceStage v-if="p.doc.asset" :grid="p.doc.grid" />
+      </div>
+      <div v-else-if="p.mode.value === 'text'" class="trace-scroll">
+        <TraceTextPanel v-if="p.doc.grid?.trace" />
+        <span v-else class="trace-empty">开启结构描摹后，这里会显示可定位约束的字符面板。</span>
+      </div>
+      <div v-else class="art-scroll">
         <ArtCanvas
           v-if="p.doc.grid && p.mode.value === 'art'"
           :grid="p.doc.grid"
@@ -42,14 +61,6 @@ const text = computed(() =>
           :background="p.doc.settings.background"
           :zoom="p.zoom.value"
         />
-        <pre
-          v-else-if="p.doc.grid"
-          data-testid="text-preview"
-          :style="{
-            fontSize: (14 * p.zoom.value) / 100 + 'px',
-            lineHeight: (16 * p.zoom.value) / 100 + 'px',
-          }"
-          >{{ text }}</pre>
         <span v-else>正在准备字符画…</span>
       </div>
       <div class="stage-corner">
@@ -66,6 +77,9 @@ const text = computed(() =>
               : "待重新生成"
         }}
         <span class="muted">/ {{ p.count.value }} 个字符</span></span
+      >
+      <span v-if="p.doc.grid?.trace" class="mono trace-hash"
+        >hash {{ p.doc.grid.trace.hash }}</span
       >
       <div class="zoom">
         <button

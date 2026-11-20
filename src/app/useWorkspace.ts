@@ -22,6 +22,12 @@ export function useWorkspace() {
     }, 60);
   }
   watch(() => doc.settings.background, invalidate);
+  watch(
+    () => doc.settings.color,
+    () => {
+      /* colour only affects rendering, no re-solve needed */
+    },
+  );
   provide(studioKey, { doc, busy, notice, invalidate });
   return { doc, busy, notice };
 }

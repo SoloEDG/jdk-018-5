@@ -6,6 +6,8 @@ import { CropPanel } from "../features/crop";
 import { MappingPanel } from "../features/mapping";
 import { PreviewPanel } from "../features/preview";
 import { ExportPanel } from "../features/export";
+import { TracePanel } from "../features/trace";
+import { DiagnosticsPanel } from "../features/trace";
 const w = useWorkspace();
 </script>
 <template>
@@ -19,22 +21,22 @@ const w = useWorkspace();
       >
       <div class="header-right">
         <span><LockKeyhole :size="12" /> 本地处理 · 无需上传</span
-        ><span class="version">V.1.0 <ArrowUpRight :size="12" /></span>
+        ><span class="version">V.1.1 <ArrowUpRight :size="12" /></span>
       </div>
     </header>
     <div class="intro">
       <div>
         <div class="eyebrow"><span /> THE ART OF LESS</div>
         <h1>让图像，用字符说话<span>。</span></h1>
-        <p>把细腻光影，转译成有温度的 ASCII 艺术。</p>
+        <p>把细腻光影，转译成有温度的 ASCII 艺术；也能先描摹结构，再让字符沿着建筑边缘走。</p>
       </div>
       <div class="intro-code">
-        . : - = + * # % @<small>PIXELS → CHARACTERS → ART</small>
+        . : - = + * # % @<small>PIXELS → CONTOURS → CHARACTERS</small>
       </div>
     </div>
     <div class="editor">
-      <aside><SourcePanel /><CropPanel /><MappingPanel /></aside>
-      <div class="result"><PreviewPanel /><ExportPanel /></div>
+      <aside><SourcePanel /><CropPanel /><MappingPanel /><TracePanel /></aside>
+      <div class="result"><PreviewPanel /><DiagnosticsPanel /><ExportPanel /></div>
     </div>
     <footer>
       <span role="status">{{ w.notice.value }}</span
